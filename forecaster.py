@@ -1,12 +1,14 @@
 import queue
 import sys
 import threading
+import json
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from weather_response import *
+from weatherToIcon import map_weather_code_to_image_path
 
 
 class MainWindow(QMainWindow):
@@ -16,8 +18,8 @@ class MainWindow(QMainWindow):
         self.input_textbox = MainWindow.InputTextBox("", self, self)
         self.error_label = QLabel()
         self.request_queue = queue.Queue()
-        self.request_thread = threading.Thread(target=self.forecast,
-                                               args=(self.request_queue,))
+        self.forecast_thread = threading.Thread(target=self.forecast,
+                                                args=(self.request_queue,))
 
         self.init_window()
 
@@ -29,7 +31,7 @@ class MainWindow(QMainWindow):
                            "background-position: center;}")
 
         self.create_layout()
-        self.request_thread.start()
+        self.forecast_thread.start()
         self.show()
 
     def create_layout(self):
@@ -57,7 +59,7 @@ class MainWindow(QMainWindow):
         forecast_button.clicked.connect(self.request_weather)
         grid_layout.addWidget(forecast_button, 2, 1)
 
-        group_box = QGroupBox("What is your desired forecast?")
+        group_box = QGroupBox("What is the weather like in...?")
         group_box.setLayout(grid_layout)
 
         vbox_layout = QVBoxLayout()
@@ -69,16 +71,32 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
 
     def request_weather(self):
-        self.error_label.setText("")
+        self.error_label.clear()
         self.request_queue.put(self.input_textbox.text())
 
     def forecast(self, queue):
         while True:
             try:
-                response = return_current_weather_data_by_city_name(queue.get())
-                print(response)
+                response = json.loads(return_current_weather_data_by_city_name(queue.get()))
+                self.refresh(response)
             except:
-                self.error_label.setText("No connection to internet. Please check your connection")
+                self.error_label.setText("No connection to the internet. Please check your connection")
+
+    def refresh(self, response):
+        if response is not None:
+            internal_code = response["cod"]
+            if internal_code[0] == 3:
+                self.error_label.setText("There seems to be a problem...")
+            elif internal_code[0] == 4:
+                self.error_label.setText("Failed to connect to service.")
+            elif internal_code[0] == 5:
+                self.error_label.setText("The weather service seems to be unavailable. Please try again later.")
+            else:
+                # TODO
+                pass
+        else:
+            # TODO
+            pass
 
     class InputTextBox(QLineEdit):
 
