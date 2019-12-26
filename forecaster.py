@@ -189,10 +189,9 @@ class MainWindow(QMainWindow):
         else:
             city_desc = "somewhere out " + "\n" + \
                         "there..."
-
         self.city_desc_label.setText(city_desc)
 
-        curr_time = datetime.datetime.now() + datetime.timedelta(hours=response["timezone"])
+        curr_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=response["timezone"])
         self.time_label.setText(curr_time.ctime())
         self.temp_label.setText(str(int(response["main"]["temp"])) + u"\u2103")
 
