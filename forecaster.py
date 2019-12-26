@@ -167,13 +167,13 @@ class MainWindow(QMainWindow):
     def refresh(self, response):
         if response is not None:
             internal_code = str(response["cod"])
-            if internal_code[0] == 3:
+            if internal_code[0] == "3":
                 self.error_label.setText("There seems to be a problem...")
             elif internal_code == "404":
                 self.error_label.setText("The location could not be found. Please try a different one.")
-            elif internal_code[0] == 4:
+            elif internal_code[0] == "4":
                 self.error_label.setText("Failed to connect to service.")
-            elif internal_code[0] == 5:
+            elif internal_code[0] == "5":
                 self.error_label.setText("The weather service seems to be unavailable. Please try again later.")
             else:
                 self.load_ui(response)
@@ -184,7 +184,7 @@ class MainWindow(QMainWindow):
 
     def load_ui(self, response):
 
-        if response["name"] != "":
+        if "name" in response and response["name"] != "":
             city_desc = response["name"] + ", " + response["sys"]["country"]
         else:
             city_desc = "somewhere out " + "\n" + \

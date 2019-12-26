@@ -48,7 +48,7 @@ def weather_response(request):
     if len(split_request) == 2:
         if is_number(split_request[0]) and is_number(split_request[1]) and \
                 -180 < float(split_request[0]) < 180 and -90 < float(split_request[1]) < 90:
-            response = return_current_weather_data_by_coords(split_request[0], split_request[1])
+            response = return_current_weather_data_by_coords(float(split_request[0]), float(split_request[1]))
         elif is_number(split_request[0]) and not is_number(split_request[1]):
             response = return_current_weather_data_by_zip_code(request)
         else:
