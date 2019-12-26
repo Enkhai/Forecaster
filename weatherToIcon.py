@@ -23,6 +23,7 @@ suffix = "@2x.png"
 directory = os.path.join(os.getcwd(), "icons\\weather\\")
 
 
+# unused
 def map_weather_code_to_image_path(code, sunrise, sunset):
     icon = mappings[code]
     sysdate = int(time.time())

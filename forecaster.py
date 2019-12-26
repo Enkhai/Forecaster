@@ -10,7 +10,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from weather_response import *
+from weather_response import weather_response
 
 
 class MainWindow(QMainWindow):
@@ -154,7 +154,11 @@ class MainWindow(QMainWindow):
     def forecast(self, request_queue):
         while True:
             try:
-                response = json.loads(return_current_weather_data_by_city_name(request_queue.get()))
+                response = None
+                try:
+                    response = json.loads(weather_response(request_queue.get()))
+                except TypeError:
+                    pass
                 self.refresh(response)
             except ConnectionError as exc:
                 self.error_label.setText("No connection to the internet. Please check your connection")
@@ -179,7 +183,15 @@ class MainWindow(QMainWindow):
                 self.load_ui(self.response)
 
     def load_ui(self, response):
-        self.city_desc_label.setText(response["name"] + ", " + response["sys"]["country"])
+
+        if response["name"] != "":
+            city_desc = response["name"] + ", " + response["sys"]["country"]
+        else:
+            city_desc = "somewhere out " + "\n" + \
+                        "there..."
+
+        self.city_desc_label.setText(city_desc)
+
         curr_time = datetime.datetime.now() + datetime.timedelta(hours=response["timezone"])
         self.time_label.setText(curr_time.ctime())
         self.temp_label.setText(str(int(response["main"]["temp"])) + u"\u2103")
@@ -187,7 +199,7 @@ class MainWindow(QMainWindow):
         self.coord_label.setText("Lon: " + str(response["coord"]["lon"]) + "\n" +
                                  "Lat: " + str(response["coord"]["lat"]))
         self.weather_icon_label.setPixmap(QPixmap("icons/weather/" + response["weather"][0]["icon"] + "@2x.png"))
-        self.wind_label.setText(str(response["wind"]["speed"]) + " Km/h")
+        self.wind_label.setText(str(response["wind"]["speed"]) + " Beaufort")
 
     class InputTextBox(QLineEdit):
 
