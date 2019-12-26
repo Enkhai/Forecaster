@@ -4,13 +4,14 @@ import threading
 import json
 import datetime
 from requests.exceptions import ConnectionError
-import css
+import copy
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from weather_response import weather_response
+import css
 
 
 class MainWindow(QMainWindow):
@@ -149,7 +150,7 @@ class MainWindow(QMainWindow):
         self.error_label.clear()
         self.temp_label.setMovie(self.loading_gif_movie)
 
-        self.request_queue.put(self.input_textbox.text())
+        self.request_queue.put(copy.copy(self.input_textbox.text()))
 
     def forecast(self, request_queue):
         while True:
